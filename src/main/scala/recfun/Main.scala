@@ -84,35 +84,36 @@ object Main {
     */
   def countChange(money: Int, coins: List[Int]): Int = {
 
-    def genFiltered(coinsIter: List[Int], k: Int): Int = {
-      var finalList = List.fill(k)(coinsIter).flatten.combinations(k).toList.par.filter(_.sum == money).toList
-      println("finalList", finalList.length, finalList)
-      finalList.length
+    /*def countChangeInter(coins: List[Int], money: Int): Int = {
+      if (money == 0) return 1
+      if (coins.isEmpty || money < 0) return 0
+
+      countChangeInter(coins, money - coins.head) + countChangeInter(coins.tail, money)
     }
 
-    def countChangeIter(k: Int, coinsIter: List[Int], acc: Int): Int = {
-      println("k", k)
-      println("coinsIter", coinsIter)
-      if (coinsIter.head * k > money) {
-        acc
-      } else {
-        if (coinsIter.last * (k - 1) > money) {
-          countChangeIter(k + 1, coinsIter.dropRight(1), genFiltered(coinsIter, k) + acc)
-        } else {
-          countChangeIter(k + 1, coinsIter, genFiltered(coinsIter, k) + acc)
-        }
+    countChangeInter(coins, money)*/
 
+
+    var table = Array.ofDim[Int](coins.length + 1, money + 1)
+
+    for (coinArray <- table) coinArray(0) = 1
+
+    for (i <- 1 until coins.length + 1) {
+      for (j <- 1 until money + 1) {
+        if (coins(i - 1) <= j) {
+          table(i)(j) = table(i - 1)(j) + table(i)(j - coins(i - 1))
+        } else {
+          table(i)(j) = table(i - 1)(j)
+        }
       }
 
+
     }
 
-    var reducedCoins = coins.sorted.filter(_ < money)
-    if (reducedCoins.nonEmpty) {
-      countChangeIter(1, reducedCoins, 0)
-    } else {
-      0
-    }
+
+    table(coins.length)(money)
 
 
   }
+
 }
